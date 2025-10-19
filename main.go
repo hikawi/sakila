@@ -22,7 +22,7 @@ func EnsureEnvExists(path string) string {
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("fatal: error loading .env file")
+		log.Println("warn: error loading .env file, hopefully it is injected in")
 	}
 
 	// Setup MySQL
