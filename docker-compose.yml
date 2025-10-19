@@ -1,0 +1,34 @@
+name: awad
+
+volumes:
+  mariadb:
+    name: awad-mysql
+
+networks:
+  nw:
+    driver: bridge
+    name: awad-nw
+
+services:
+  mysql:
+    image: mariadb:12
+    hostname: mysql
+    container_name: awad-mysql
+    networks:
+      - nw
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ./sakila-mysql.sql:/docker-entrypoint-initdb.d/init.sql
+      - mariadb:/var/lib/mysql
