@@ -42,7 +42,7 @@ jobs:
         env:
           CGO_ENABLED: 0
           GOOS: linux
-        run: go build . -o server
+        run: go build
 
   build:
     name: Build & Push to GHCR
