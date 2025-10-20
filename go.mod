@@ -1,4 +1,4 @@
-module luny.dev/awad-w1
+module luny.dev/sakila
 
 go 1.25.3
 

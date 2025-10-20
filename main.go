@@ -8,7 +8,8 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"luny.dev/awad-w1/routes"
+	"luny.dev/sakila/routes"
+	v1 "luny.dev/sakila/routes/v1"
 )
 
 func EnsureEnvExists(path string) string {
@@ -35,16 +36,29 @@ func main() {
 
 	app := gin.Default()
 
+	// API v1 group.
 	{
-		r := app.Group("/api")
-		r.GET("/health", routes.GetHealthFunc)
+		r := app.Group("/v1")
 
-		actors := routes.ActorsHandler{DB: db}
+		actors := v1.ActorsHandler{DB: db}
 		r.GET("/actors", actors.GetActors)
 		r.GET("/actors/:id", actors.GetActorID)
 		r.POST("/actors", actors.PostActor)
 		r.DELETE("/actors/:id", actors.DeleteActor)
 		r.PATCH("/actors/:id", actors.PatchActor)
+
+		films := v1.FilmsHandler{DB: db}
+		r.GET("/films", films.GetFilms)
+		r.GET("/films/:id", films.GetFilmID)
+		r.POST("/films", films.PostFilm)
+		r.PATCH("/films/:id", films.PatchFilm)
+		r.DELETE("/films/:id", films.DeleteFilm)
+	}
+
+	// Root group.
+	{
+		r := app.Group("")
+		r.GET("/health", routes.GetHealthFunc)
 	}
 
 	app.Run("0.0.0.0:80")

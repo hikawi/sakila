@@ -1,4 +1,4 @@
-package routes
+package v1
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"gorm.io/gorm"
-	"luny.dev/awad-w1/models"
+	"luny.dev/sakila/models"
 )
 
 type ActorsHandler struct {

@@ -6,9 +6,6 @@ import (
 
 // Actor represents the 'actor' table in the database.
 type Actor struct {
-	// gorm.Model is typically used, but to exactly match the schema,
-	// we will define the fields explicitly.
-
 	// actor_id smallint(5) unsigned NOT NULL AUTO_INCREMENT
 	ActorID uint16 `gorm:"primaryKey;autoIncrement;column:actor_id" json:"actor_id"`
 
