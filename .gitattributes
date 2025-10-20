@@ -1,0 +1,5 @@
+sakila-mysql.sql linguist-vendored
+* text=auto
+*.sh text eol=lf
+*.bat text eol=crlf
+
