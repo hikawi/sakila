@@ -32,3 +32,17 @@ services:
     volumes:
       - ./sakila-mysql.sql:/docker-entrypoint-initdb.d/init.sql
       - mariadb:/var/lib/mysql
+
+  week1:
+    build:
+      context: week1
+    container_name: awad-week1
+    profiles: ["week1"]
+    networks: ["nw"]
+    environment:
+      MYSQL_DSN: ${MYSQL_DSN}
+    ports:
+      - 3000:80
+    depends_on:
+      mysql:
+        condition: service_healthy

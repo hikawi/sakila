@@ -2,14 +2,19 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	_ "luny.dev/sakila/docs"
 	"luny.dev/sakila/routes"
 	v1 "luny.dev/sakila/routes/v1"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func EnsureEnvExists(path string) string {
@@ -20,6 +25,11 @@ func EnsureEnvExists(path string) string {
 	return val
 }
 
+// @title           Sakila API
+// @version         1.0
+// @description     The Go/Gin backend API for the Sakila database.
+// @host            api.sakila.luny.dev
+// @BasePath        /
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -56,9 +66,14 @@ func main() {
 	}
 
 	// Root group.
+	// Lowest place to prevent any overrides, such as public serves.
 	{
 		r := app.Group("")
-		r.GET("/health", routes.GetHealthFunc)
+		r.GET("/health", routes.GetHealth)
+		r.GET("/docs", func(c *gin.Context) {
+			c.Redirect(http.StatusMovedPermanently, "/docs/index.html")
+		})
+		r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	app.Run("0.0.0.0:80")

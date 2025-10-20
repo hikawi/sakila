@@ -1,3 +1,4 @@
+// Package models provides a set of models used for this assignment.
 package models
 
 import (

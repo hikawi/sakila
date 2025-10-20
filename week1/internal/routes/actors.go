@@ -1,4 +1,5 @@
-package v1
+// Package routes provides a set of routes under the API.
+package routes
 
 import (
 	"context"
@@ -9,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"gorm.io/gorm"
-	"luny.dev/sakila/models"
+	"luny.dev/sakila/w1/internal/models"
 )
 
 type ActorsHandler struct {
@@ -116,7 +117,7 @@ func (h *ActorsHandler) PostActor(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "created"})
+	c.JSON(http.StatusCreated, actor)
 }
 
 func (h *ActorsHandler) PatchActor(c *gin.Context) {
@@ -140,13 +141,23 @@ func (h *ActorsHandler) PatchActor(c *gin.Context) {
 	}
 
 	ctx := context.Background()
-	res, err := gorm.G[models.Actor](h.DB).Where("actor_id = ?", id).Updates(ctx, models.Actor{FirstName: body.FirstName, LastName: body.LastName})
+
+	res, err := gorm.G[models.Actor](h.DB).
+		Where("actor_id = ?", id).
+		Updates(ctx, models.Actor{FirstName: body.FirstName, LastName: body.LastName})
+	if err != nil || res == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Retrieve the actor updated
+	actor, err := gorm.G[models.Actor](h.DB).Where("actor_id = ?", id).First(ctx)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusNoContent, gin.H{"affected": res})
+	c.JSON(http.StatusOK, actor)
 }
 
 func (h *ActorsHandler) DeleteActor(c *gin.Context) {

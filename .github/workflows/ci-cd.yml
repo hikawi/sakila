@@ -6,6 +6,10 @@ on:
 
 jobs:
   test:
+    strategy:
+      matrix:
+        week:
+          - week1
     runs-on: ubuntu-latest
     name: Test
     steps:
@@ -19,11 +23,17 @@ jobs:
 
       - name: Install Dependencies
         run: go mod download
+        working-directory: ${{ matrix.week }}
 
       - name: Test Go App
         run: go test
+        working-directory: ${{ matrix.week }}
 
-  fake-build:
+  build:
+    strategy:
+      matrix:
+        week:
+          - week1
     name: Build only
     runs-on: ubuntu-latest
     steps:
@@ -37,58 +47,60 @@ jobs:
 
       - name: Install Dependencies
         run: go mod download
+        working-directory: ${{ matrix.week }}
 
       - name: Build Go App
         env:
           CGO_ENABLED: 0
           GOOS: linux
         run: go build
+        working-directory: ${{ matrix.week }}
 
-  build:
-    name: Build & Push to GHCR
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: ["test", "fake-build"]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+  # push:
+  #   name: Build & Push to GHCR
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   needs: ["test", "build"]
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     packages: write
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v5
+  #
+  #     - name: Log in to GHCR
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+  #
+  #     - name: Build and push Docker image (latest + commit-sha)
+  #       id: build-push
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: |
+  #           ghcr.io/hikawi/sakila:latest
+  #           ghcr.io/hikawi/sakila:${{ github.sha }}
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image (latest + commit-sha)
-        id: build-push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ghcr.io/hikawi/sakila:latest
-            ghcr.io/hikawi/sakila:${{ github.sha }}
-
-  deploy:
-    runs-on: ubuntu-latest
-    name: Deploy to VPS
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: ["build"]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          sparse-checkout: |
-            scripts
-
-      - name: SSH Deploy
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          script_path: scripts/deploy.sh
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   name: Deploy to VPS
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   needs: ["build"]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v5
+  #       with:
+  #         sparse-checkout: |
+  #           scripts
+  #
+  #     - name: SSH Deploy
+  #       uses: appleboy/ssh-action@v1
+  #       with:
+  #         host: ${{ secrets.SSH_HOST }}
+  #         username: ${{ secrets.SSH_USER }}
+  #         password: ${{ secrets.SSH_PASSWORD }}
+  #         script_path: scripts/deploy.sh
