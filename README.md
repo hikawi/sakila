@@ -32,9 +32,21 @@ docker compose --profile week1 up
 
 By default, there are these published ports:
 
+- `3306` for MySQL.
 - `3000` for Week 1.
+- `3001` for Week 2.
+
+I know usually when you isolate profiles, these will only map in the correct
+ports for that specific week. But if in any case, you need to spin up every
+service, this port difference is for that reason.
+
+```bash
+docker compose --profile * up
+```
 
 ### Native Golang
+
+**This is better for development**.
 
 Requirements:
 
@@ -61,6 +73,7 @@ local `.env` file is supported.
 
 ## Week Overview
 
-| Week | Contents        |
-| :--: | --------------- |
-|  1   | Actors REST API |
+| Week | Contents                               |
+| :--: | -------------------------------------- |
+|  1   | Actors REST API                        |
+|  2   | Films REST API + Swagger Documentation |

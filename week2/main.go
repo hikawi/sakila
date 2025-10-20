@@ -7,14 +7,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	_ "luny.dev/sakila/docs"
-	"luny.dev/sakila/routes"
-	v1 "luny.dev/sakila/routes/v1"
-
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	_ "luny.dev/sakila/w2/docs"
+	"luny.dev/sakila/w2/internal/routes"
 )
 
 func EnsureEnvExists(path string) string {
@@ -25,10 +23,10 @@ func EnsureEnvExists(path string) string {
 	return val
 }
 
-// @title           Sakila API
+// @title           Sakila API Week 2
 // @version         1.0
-// @description     The Go/Gin backend API for the Sakila database.
-// @host            api.sakila.luny.dev
+// @description     The Go/Gin backend API for the Sakila database for week 2.
+// @host            localhost:3001
 // @BasePath        /
 func main() {
 	err := godotenv.Load()
@@ -46,18 +44,11 @@ func main() {
 
 	app := gin.Default()
 
-	// API v1 group.
+	// API group.
 	{
-		r := app.Group("/v1")
+		r := app.Group("")
 
-		actors := v1.ActorsHandler{DB: db}
-		r.GET("/actors", actors.GetActors)
-		r.GET("/actors/:id", actors.GetActorID)
-		r.POST("/actors", actors.PostActor)
-		r.DELETE("/actors/:id", actors.DeleteActor)
-		r.PATCH("/actors/:id", actors.PatchActor)
-
-		films := v1.FilmsHandler{DB: db}
+		films := routes.FilmsHandler{DB: db}
 		r.GET("/films", films.GetFilms)
 		r.GET("/films/:id", films.GetFilmID)
 		r.POST("/films", films.PostFilm)
@@ -69,7 +60,6 @@ func main() {
 	// Lowest place to prevent any overrides, such as public serves.
 	{
 		r := app.Group("")
-		r.GET("/health", routes.GetHealth)
 		r.GET("/docs", func(c *gin.Context) {
 			c.Redirect(http.StatusMovedPermanently, "/docs/index.html")
 		})

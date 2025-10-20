@@ -10,6 +10,7 @@ jobs:
       matrix:
         week:
           - week1
+          - week2
     runs-on: ubuntu-latest
     name: Test
     steps:
@@ -20,6 +21,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ">=1.25"
+          cache-dependency-path: ${{ matrix.week }}/go.sum
 
       - name: Install Dependencies
         run: go mod download
@@ -34,6 +36,7 @@ jobs:
       matrix:
         week:
           - week1
+          - week2
     name: Build only
     runs-on: ubuntu-latest
     steps:
@@ -44,6 +47,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ">=1.25"
+          cache-dependency-path: ${{ matrix.week }}/go.sum
 
       - name: Install Dependencies
         run: go mod download

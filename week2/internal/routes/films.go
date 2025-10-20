@@ -1,5 +1,5 @@
-// Package v1 includes a set of all API routes under /v1
-package v1
+// Package routes includes a set of all API routes under /v1
+package routes
 
 import (
 	"context"
@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"gorm.io/gorm"
-	"luny.dev/sakila/models"
-	"luny.dev/sakila/utils"
+	"luny.dev/sakila/w2/internal/models"
+	"luny.dev/sakila/w2/utils"
 )
 
 type FilmsHandler struct {
@@ -186,6 +186,19 @@ type PatchFilmBody struct {
 	SpecialFeatures *utils.StringSet `json:"special_features" validate:"omitempty"`
 }
 
+// GetFilms retrieves a page of all films in the database.
+//
+// @Summary Get a list of films with pagination
+// @Description Retrieves a paginated list of films from the database.
+// @Tags films
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number (e.g., 1)" default(1)
+// @Param per_page query int false "Items per page (e.g., 10)" default(10)
+// @Success 200 {object} map[string]interface{} "Successfully retrieved films"
+// @Failure 400 {object} map[string]string "Invalid query parameters"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /films [get]
 func (h *FilmsHandler) GetFilms(c *gin.Context) {
 	_, err := h.DB.DB()
 	if err != nil {
@@ -201,7 +214,8 @@ func (h *FilmsHandler) GetFilms(c *gin.Context) {
 
 	ctx := context.Background()
 
-	res, err := gorm.G[models.Film](h.DB.Debug()).
+	res, err := gorm.G[models.Film](h.DB).
+		Preload("Language", nil).
 		Limit(query.PerPage).
 		Offset((query.Page - 1) * query.PerPage).
 		Find(ctx)
@@ -225,6 +239,19 @@ func (h *FilmsHandler) GetFilms(c *gin.Context) {
 	})
 }
 
+// GetFilmID returns a single film by its ID.
+//
+// @Summary Get a film by ID
+// @Description Retrieves a single film record from the database using its FilmID.
+// @Tags films
+// @Accept json
+// @Produce json
+// @Param id path int true "Film ID"
+// @Success 200 {object} models.Film "Successfully retrieved the film"
+// @Failure 400 {object} map[string]string "Invalid film ID format"
+// @Failure 404 {object} map[string]string "Film not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /films/{id} [get]
 func (h *FilmsHandler) GetFilmID(c *gin.Context) {
 	_, err := h.DB.DB()
 	if err != nil {
@@ -240,7 +267,7 @@ func (h *FilmsHandler) GetFilmID(c *gin.Context) {
 	}
 
 	ctx := context.Background()
-	res, err := gorm.G[models.Film](h.DB).Where("film_id = ?", id).First(ctx)
+	res, err := gorm.G[models.Film](h.DB).Preload("Language", nil).Where("film_id = ?", id).First(ctx)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "that film can not be found"})
 		return
@@ -249,6 +276,18 @@ func (h *FilmsHandler) GetFilmID(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// PostFilm creates a new film entry in the DB.
+//
+// @Summary Create a new film
+// @Description Creates a new film record in the database.
+// @Tags films
+// @Accept json
+// @Produce json
+// @Param film body PostFilmBody true "Film data for creation"
+// @Success 201 {object} models.Film "Successfully created the film"
+// @Failure 400 {object} map[string]string "Invalid input data or missing required fields"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /films [post]
 func (h *FilmsHandler) PostFilm(c *gin.Context) {
 	_, err := h.DB.DB()
 	if err != nil {
@@ -273,6 +312,20 @@ func (h *FilmsHandler) PostFilm(c *gin.Context) {
 	c.JSON(http.StatusCreated, film)
 }
 
+// PatchFilm updates a film existing record with new information
+//
+// @Summary Update an existing film
+// @Description Updates specific fields of an existing film record identified by ID.
+// @Tags films
+// @Accept json
+// @Produce json
+// @Param id path int true "Film ID"
+// @Param film body PatchFilmBody true "Film data for partial update (patch)"
+// @Success 200 {object} models.Film "Successfully updated the film"
+// @Failure 400 {object} map[string]string "Invalid input data or ID format"
+// @Failure 404 {object} map[string]string "Film not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /films/{id} [patch]
 func (h *FilmsHandler) PatchFilm(c *gin.Context) {
 	_, err := h.DB.DB()
 	if err != nil {
@@ -301,9 +354,28 @@ func (h *FilmsHandler) PatchFilm(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, film)
+	updatedFilm, err := gorm.G[models.Film](h.DB).Preload("Language", nil).Where("film_id = ?", id).First(ctx)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "that film can not be found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedFilm)
 }
 
+// DeleteFilm deletes a single record of a film
+//
+// @Summary Delete a film by ID
+// @Description Deletes a single film record from the database using its FilmID.
+// @Tags films
+// @Accept json
+// @Produce json
+// @Param id path int true "Film ID"
+// @Success 204 "Successfully deleted the film (No Content)"
+// @Failure 400 {object} map[string]string "Invalid film ID format"
+// @Failure 404 {object} map[string]string "Film not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /films/{id} [delete]
 func (h *FilmsHandler) DeleteFilm(c *gin.Context) {
 	_, err := h.DB.DB()
 	if err != nil {

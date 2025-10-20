@@ -46,3 +46,17 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+
+  week2:
+    build:
+      context: week2
+    container_name: awad-week2
+    profiles: ["week2"]
+    networks: ["nw"]
+    environment:
+      MYSQL_DSN: ${MYSQL_DSN}
+    ports:
+      - 3001:80
+    depends_on:
+      mysql:
+        condition: service_healthy

@@ -1,0 +1,345 @@
+basePath: /
+definitions:
+  models.Film:
+    properties:
+      description:
+        type: string
+      film_id:
+        type: integer
+      language:
+        $ref: '#/definitions/models.Language'
+      language_id:
+        type: integer
+      lastUpdate:
+        type: string
+      length:
+        type: integer
+      original_language:
+        $ref: '#/definitions/models.Language'
+      original_language_id:
+        type: integer
+      rating:
+        type: string
+      release_year:
+        type: integer
+      rental_duration:
+        type: integer
+      rental_rate:
+        type: number
+      replacement_cost:
+        type: number
+      special_features:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
+  models.Language:
+    properties:
+      language_id:
+        type: integer
+      last_updated:
+        type: string
+      name:
+        type: string
+    type: object
+  routes.PatchFilmBody:
+    properties:
+      description:
+        type: string
+      language_id:
+        description: These are foreign keys, can be updated
+        minimum: 1
+        type: integer
+      length:
+        minimum: 1
+        type: integer
+      original_language_id:
+        minimum: 1
+        type: integer
+      rating:
+        description: rating validation remains the same
+        enum:
+        - G
+        - PG
+        - PG-13
+        - R
+        - NC-17
+        type: string
+      release_year:
+        maximum: 2155
+        minimum: 1901
+        type: integer
+      rental_duration:
+        minimum: 1
+        type: integer
+      rental_rate:
+        type: number
+      replacement_cost:
+        type: number
+      special_features:
+        description: special_features uses your custom StringSet type (made optional
+          via the pointer)
+        items:
+          type: string
+        type: array
+      title:
+        description: ALL FIELDS ARE POINTERS (Optionals)
+        maxLength: 255
+        type: string
+    type: object
+  routes.PostFilmBody:
+    properties:
+      description:
+        description: OPTIONAL FIELDS
+        type: string
+      language_id:
+        description: language_id is NOT NULL in DB, so it's required here
+        minimum: 1
+        type: integer
+      length:
+        minimum: 1
+        type: integer
+      original_language_id:
+        description: Original language is nullable
+        minimum: 1
+        type: integer
+      rating:
+        description: rating must be one of the enum values
+        enum:
+        - G
+        - PG
+        - PG-13
+        - R
+        - NC-17
+        type: string
+      release_year:
+        description: YEAR(4) range
+        maximum: 2155
+        minimum: 1901
+        type: integer
+      rental_duration:
+        description: rental_duration is NOT NULL and has a default, but still required
+          for clarity
+        minimum: 1
+        type: integer
+      rental_rate:
+        description: rental_rate is NOT NULL and has a default
+        type: number
+      replacement_cost:
+        description: replacement_cost is NOT NULL and has a default
+        type: number
+      special_features:
+        description: special_features uses your custom StringSet type
+        items:
+          type: string
+        type: array
+      title:
+        description: REQUIRED FIELDS
+        maxLength: 255
+        type: string
+    required:
+    - language_id
+    - title
+    type: object
+host: localhost:3001
+info:
+  contact: {}
+  description: The Go/Gin backend API for the Sakila database for week 2.
+  title: Sakila API Week 2
+  version: "1.0"
+paths:
+  /films:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a paginated list of films from the database.
+      parameters:
+      - default: 1
+        description: Page number (e.g., 1)
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page (e.g., 10)
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved films
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid query parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a list of films with pagination
+      tags:
+      - films
+    post:
+      consumes:
+      - application/json
+      description: Creates a new film record in the database.
+      parameters:
+      - description: Film data for creation
+        in: body
+        name: film
+        required: true
+        schema:
+          $ref: '#/definitions/routes.PostFilmBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created the film
+          schema:
+            $ref: '#/definitions/models.Film'
+        "400":
+          description: Invalid input data or missing required fields
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new film
+      tags:
+      - films
+  /films/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a single film record from the database using its FilmID.
+      parameters:
+      - description: Film ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Successfully deleted the film (No Content)
+        "400":
+          description: Invalid film ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Film not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a film by ID
+      tags:
+      - films
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a single film record from the database using its FilmID.
+      parameters:
+      - description: Film ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved the film
+          schema:
+            $ref: '#/definitions/models.Film'
+        "400":
+          description: Invalid film ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Film not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a film by ID
+      tags:
+      - films
+    patch:
+      consumes:
+      - application/json
+      description: Updates specific fields of an existing film record identified by
+        ID.
+      parameters:
+      - description: Film ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Film data for partial update (patch)
+        in: body
+        name: film
+        required: true
+        schema:
+          $ref: '#/definitions/routes.PatchFilmBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated the film
+          schema:
+            $ref: '#/definitions/models.Film'
+        "400":
+          description: Invalid input data or ID format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Film not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update an existing film
+      tags:
+      - films
+swagger: "2.0"
