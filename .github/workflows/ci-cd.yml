@@ -23,6 +23,8 @@ jobs:
               - 'week1/**'
             week2:
               - 'week2/**'
+            week3:
+              - 'week3/**'
 
   test:
     needs: ["changes"]

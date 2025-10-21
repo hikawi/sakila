@@ -91,3 +91,4 @@ integrations.
 | :--: | ---------------------------------------------------------- |
 |  1   | Actors REST API                                            |
 |  2   | Films REST API + Request Validator + Swagger Documentation |
+|  3   | Actors REST API + ODL stack for logging and monitoring     |

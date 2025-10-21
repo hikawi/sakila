@@ -3,6 +3,8 @@ name: awad
 volumes:
   mariadb:
     name: awad-mysql
+  opensearch-data:
+    name: awad-opensearch
 
 networks:
   nw:
@@ -67,4 +69,107 @@ services:
       MYSQL_DSN: ${MYSQL_DSN}
     depends_on:
       mysql:
+        condition: service_healthy
+
+  # Taken from OpenSearch's Docker example file for local development
+  week3-opensearch:
+    image: opensearchproject/opensearch
+    container_name: awad-week3-opensearch-node1
+    hostname: awad-week3-opensearch-node1
+    environment:
+      - cluster.name=opensearch-cluster # Name the cluster
+      - node.name=opensearch-node1 # Name the node that will run in this container
+      - discovery.seed_hosts=opensearch-node1 # Nodes to look for when discovering the cluster
+      - cluster.initial_master_nodes=opensearch-node1
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # Set min and max JVM heap sizes to at least 50% of system RAM
+      - "DISABLE_INSTALL_DEMO_CONFIG=true" # Prevents execution of bundled demo script which installs demo certificates and security configurations to OpenSearch
+      - "DISABLE_SECURITY_PLUGIN=true" # Disables Security plugin
+    profiles: ["week3"]
+    networks: ["nw"]
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600
+    healthcheck:
+      test: ["CMD", "curl", "-fsSL", "http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # Taken from OpenSearch's Docker example file
+  week3-opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards
+    container_name: awad-week3-opensearch-dashboard
+    ports:
+      - 5601:5601
+    profiles: ["week3"]
+    networks: ["nw"]
+    expose:
+      - "5601" # Expose port 5601 for web access to OpenSearch Dashboards
+    environment:
+      - 'OPENSEARCH_HOSTS=["http://awad-week3-opensearch-node1:9200"]'
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
+    healthcheck:
+      test: ["CMD", "curl", "-fsSL", "http://localhost:5601/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      week3-opensearch:
+        condition: service_healthy
+
+  week3-fluentbit:
+    image: fluent/fluent-bit
+    container_name: awad-week3-fluentbit
+    hostname: awad-week3-fluentbit
+    profiles: ["week3"]
+    networks: ["nw"]
+    ports:
+      - 8888:8888
+      - 2020:2020
+    volumes:
+      - ./week3/log:/var/log/fluentbit
+      - ./week3/fluent-bit.yaml:/fluent-bit/fluent-bit.yaml
+    command: /fluent-bit/bin/fluent-bit -c /fluent-bit/fluent-bit.yaml
+    healthcheck:
+      test: ["CMD", "curl", "-s", "http://localhost:2020/api/v1/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    depends_on:
+      week3-opensearch:
+        condition: service_healthy
+
+  week3:
+    image: cosmtrek/air
+    container_name: awad-week3
+    hostname: awad-week3
+    profiles: ["week3"]
+    networks: ["nw"]
+    working_dir: /app
+    ports:
+      - 3002:80
+    volumes:
+      - ./week3:/app
+      - /app/tmp
+    environment:
+      MYSQL_DSN: ${MYSQL_DSN}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      week3-opensearch:
+        condition: service_healthy
+      week3-opensearch-dashboards:
+        condition: service_healthy
+      week3-fluentbit:
         condition: service_healthy
