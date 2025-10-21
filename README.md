@@ -9,7 +9,11 @@ that.
 Each week contains a separate `README.md` file to read about its setting up,
 and the used technologies as a traceable markup.
 
-## Installation
+## Development's Environment
+
+Make sure you have setup `.env` file. If you use Compose, make sure that `.env`
+file stays at the same directory as `docker-compose.yml`. If you want to run
+native, `godotenv` also supports loading an `.env` at each week's root.
 
 ### Docker
 
@@ -19,32 +23,30 @@ Requirements:
 - Docker Compose
 - Docker Buildx
 
-There's only one central database that is MariaDB (a MySQL dialect) that is
-connected to by all other containers. This is managed by the `docker-compose.yml`
-file at root.
-
-You can use `--profile weekN` for each week's separated API.
+Docker Compose is setup to use multiple profiles to allow separate dependencies
+for each week's assignment. For example, week 1 wouldn't need week 2's swagger
+UI generator.
 
 ```bash
-# Example: Spin up week1
+# Example: spin up week1
 docker compose --profile week1 up
 ```
+
+You may use `--build` to force a rebuild, but usually a developer's compose file
+would not need it.
 
 By default, there are these published ports:
 
 - `3306` for MySQL.
 - `3000` for Week 1.
 - `3001` for Week 2.
+- `3002` for Week 3.
 
 I know usually when you isolate profiles, these will only map in the correct
 ports for that specific week. But if in any case, you need to spin up every
 service, this port difference is for that reason.
 
-```bash
-docker compose --profile * up
-```
-
-### Native Golang
+### Go Native
 
 **This is better for development**.
 
@@ -71,9 +73,21 @@ CGO_ENABLED=0 GOOS="your-os" GOARCH="your-arch" ldflags="-w -s" go build -o serv
 If you want to go native, you need to provide the correct environment values. A
 local `.env` file is supported.
 
+All weeks are using port `80`.
+
+## Production Environment
+
+The difference between a Production environment and a Developer environment is
+that I setup for the dev environment to support hot reloads, as you change files,
+Air will re-compile and re-build and re-deploy the server.
+
+A production environment has no such mechanisms, using these, if any changes
+happen, you have to force a rebuild. This is meant to be placed for smoother CI/CD
+integrations.
+
 ## Week Overview
 
-| Week | Contents                               |
-| :--: | -------------------------------------- |
-|  1   | Actors REST API                        |
-|  2   | Films REST API + Swagger Documentation |
+| Week | Contents                                                   |
+| :--: | ---------------------------------------------------------- |
+|  1   | Actors REST API                                            |
+|  2   | Films REST API + Request Validator + Swagger Documentation |

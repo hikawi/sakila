@@ -1,6 +1,6 @@
 module luny.dev/sakila/w2
 
-go 1.25.3
+go 1.25
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect

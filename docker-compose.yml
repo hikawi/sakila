@@ -34,29 +34,37 @@ services:
       - mariadb:/var/lib/mysql
 
   week1:
-    build:
-      context: week1
+    image: cosmtrek/air
     container_name: awad-week1
+    hostname: awad-week1
     profiles: ["week1"]
     networks: ["nw"]
-    environment:
-      MYSQL_DSN: ${MYSQL_DSN}
+    working_dir: /app
     ports:
       - 3000:80
+    volumes:
+      - ./week1:/app
+      - /app/tmp
+    environment:
+      MYSQL_DSN: ${MYSQL_DSN}
     depends_on:
       mysql:
         condition: service_healthy
 
   week2:
-    build:
-      context: week2
+    image: cosmtrek/air
     container_name: awad-week2
+    hostname: awad-week2
     profiles: ["week2"]
     networks: ["nw"]
-    environment:
-      MYSQL_DSN: ${MYSQL_DSN}
+    working_dir: /app
     ports:
       - 3001:80
+    volumes:
+      - ./week2:/app
+      - /app/tmp
+    environment:
+      MYSQL_DSN: ${MYSQL_DSN}
     depends_on:
       mysql:
         condition: service_healthy

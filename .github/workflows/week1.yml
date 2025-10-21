@@ -1,0 +1,16 @@
+name: Sakila Week 1 CI/CD
+
+on:
+  push:
+    branches: ["main"]
+    paths: ["week1/**"]
+  pull_request:
+    branches: ["main"]
+    paths: ["week1/**"]
+
+jobs:
+  call-cicd:
+    uses: ./.github/workflows/ci-cd-call.yml
+    with:
+      service: week1
+      publish: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
