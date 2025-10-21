@@ -1,0 +1,131 @@
+name: Sakila CI/CD
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.filter.outputs.changes }}
+    name: Check for file changes
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            week1:
+              - 'week1/**'
+            week2:
+              - 'week2/**'
+
+  test:
+    needs: ["changes"]
+    if: ${{ needs.changes.outputs.matrix != '[]' }}
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.changes.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ">=1.25"
+          cache-dependency-path: ${{ matrix.service }}/go.sum
+
+      - name: Install Dependencies
+        run: go mod download
+        working-directory: ${{ matrix.service }}
+
+      - name: Test Go App
+        run: go test
+        working-directory: ${{ matrix.service }}
+
+  build:
+    needs: ["changes", "test"]
+    if: ${{ needs.changes.outputs.matrix != '[]' }}
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.changes.outputs.matrix) }}
+    name: Build only
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ">=1.25"
+          cache-dependency-path: ${{ matrix.service }}/go.sum
+
+      - name: Install Dependencies
+        run: go mod download
+        working-directory: ${{ matrix.service }}
+
+      - name: Build Go App
+        env:
+          CGO_ENABLED: 0
+          GOOS: linux
+        run: go build
+        working-directory: ${{ matrix.service }}
+
+  push:
+    name: Build to GHCR
+    if: ${{ needs.changes.outputs.matrix != '[]' }}
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.changes.outputs.matrix) }}
+    needs: ["test", "build", "changes"]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image (latest + commit-sha)
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service }}
+          push: true
+          tags: |
+            ghcr.io/hikawi/sakila:${{ matrix.service }}
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   name: Deploy to VPS
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   needs: ["build"]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v5
+  #       with:
+  #         sparse-checkout: |
+  #           scripts
+  #
+  #     - name: SSH Deploy
+  #       uses: appleboy/ssh-action@v1
+  #       with:
+  #         host: ${{ secrets.SSH_HOST }}
+  #         username: ${{ secrets.SSH_USER }}
+  #         password: ${{ secrets.SSH_PASSWORD }}
+  #         script_path: scripts/deploy.sh

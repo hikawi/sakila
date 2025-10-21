@@ -14,7 +14,7 @@ import (
 func EnsureEnvExists(path string) string {
 	val, exists := os.LookupEnv(path)
 	if !exists {
-		log.Fatalf("fatal: can't find required env variable %s\n", path)
+		log.Fatalf("fatal: can't find required env variable %s", path)
 	}
 	return val
 }

@@ -16,7 +16,8 @@ This requires the following environment variables:
 
 - `MYSQL_DSN`: The DSN string for MySQL Connection. It is usually in the form
   `username:password@protocol(host:port)/dbname`. An example that I used for the
-  Docker Compose set is `sakila:password@tcp(awad-mysql:3306)/sakila`.
+  Docker Compose set is `sakila:password@tcp(awad-mysql:3306)/sakila`. You can
+  view the provided `.env` for this.
 
 ### Docker
 
