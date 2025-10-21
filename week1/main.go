@@ -30,7 +30,7 @@ func main() {
 	db, err := gorm.Open(mysql.Open(mysqlDsn), &gorm.Config{})
 	if err != nil {
 		log.Println(err.Error())
-		log.Fatalf("fatal: mysql database cannot be connected to")
+		log.Fatalln("fatal: mysql database cannot be connected to")
 	}
 
 	app := gin.Default()

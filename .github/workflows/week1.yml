@@ -1,5 +1,9 @@
 name: Sakila Week 1 CI/CD
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     branches: ["main"]
