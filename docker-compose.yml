@@ -136,16 +136,10 @@ services:
     networks: ["nw"]
     ports:
       - 8888:8888
-      - 2020:2020
     volumes:
-      - ./week3/log:/var/log/fluentbit
       - ./week3/fluent-bit.yaml:/fluent-bit/fluent-bit.yaml
+      - ./week3/log:/var/log/week3
     command: /fluent-bit/bin/fluent-bit -c /fluent-bit/fluent-bit.yaml
-    healthcheck:
-      test: ["CMD", "curl", "-s", "http://localhost:2020/api/v1/health"]
-      interval: 1m
-      timeout: 10s
-      retries: 3
     depends_on:
       week3-opensearch:
         condition: service_healthy
@@ -157,13 +151,16 @@ services:
     profiles: ["week3"]
     networks: ["nw"]
     working_dir: /app
+    command: 'air --build.exclude_dir "log,build"'
     ports:
       - 3002:80
     volumes:
       - ./week3:/app
+      - ./week3/log:/var/log/week3
       - /app/tmp
     environment:
       MYSQL_DSN: ${MYSQL_DSN}
+      FLUENTBIT_URL: ${FLUENTBIT_URL}
     depends_on:
       mysql:
         condition: service_healthy
@@ -172,4 +169,4 @@ services:
       week3-opensearch-dashboards:
         condition: service_healthy
       week3-fluentbit:
-        condition: service_healthy
+        condition: service_started

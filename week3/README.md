@@ -9,9 +9,11 @@ Week 3's main objective is:
 - Golang 1.25:
   - GIN Web Framework (routing, middlewares, validation)
   - GORM + MySQL Driver (modeling)
+  - Zap (Fast file logger)
+  - Lumberjack (File rotation)
 - OpenSearch (equivalent to Elasticsearch v7.1)
 - OpenSearch Dashboard (equivalent to Kibana v7.1)
-- Logstash
+- FluentBit: A logging system written in C compatible with Logstash (equivalent to Logstash)
 
 Ports used:
 
@@ -42,50 +44,11 @@ values as requested with an `.env` file at root directory.
    inside the `week3` folder will also work.
 5. Run `go run` in `week3`
 
-## Trace
+## Demonstration
 
-Setting up with Docker Compose:
-
-```yml
-# Taken from OpenSearch's Docker example file
-opensearch:
-  image: opensearchproject/opensearch
-  container_name: opensearch
-  hostname: opensearch
-  environment:
-    node.name: opensearch-node1
-    discovery.seed_hosts: opensearch-node1
-    OPENSEARCH_JAVA_OPTS: -Xmx512m -Xmx512m # Set max memory usages
-    bootstrap.memory_lock: true # Don't allow swapfile
-    OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_ADMIN_PASSWORD}
-    discovery.type: single-node
-  ulimits:
-    memlock:
-      soft: -1
-      hard: -1
-    nofile:
-      soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
-      hard: 65536
-  volumes:
-    - opensearch-data:/usr/share/opensearch/data
-  ports:
-    - 9200:9200
-    - 9600:9600
-
-# Taken from OpenSearch's Docker example file
-opensearch-dashboards:
-  image: opensearchproject/opensearch-dashboards
-  container_name: opensearch-dashboard
-  ports:
-    - 5601:5601
-  expose:
-    - "5601"
-  environment:
-    OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
-```
-
-### FluentBit setup
+![OpenSearch Dashboards](./images/dashboard.png)
 
 ## References
 
 - [FluentBit Manual](https://docs.fluentbit.io/manual/concepts/data-pipeline)
+- [Uber-go Zap](https://pkg.go.dev/go.uber.org/zap)

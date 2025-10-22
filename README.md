@@ -91,4 +91,8 @@ integrations.
 | :--: | ---------------------------------------------------------- |
 |  1   | Actors REST API                                            |
 |  2   | Films REST API + Request Validator + Swagger Documentation |
-|  3   | Actors REST API + ODL stack for logging and monitoring     |
+|  3   | Actors REST API + ODF stack for logging and monitoring (1) |
+
+Notes:
+
+- (1): Includes **O**penSearch, OpenSearch **D**ashboards and **F**luentbit.
