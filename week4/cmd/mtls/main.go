@@ -33,7 +33,7 @@ func main() {
 	// Load CA cert
 	caCert, err := os.ReadFile("./certs/ca.crt")
 	if err != nil {
-		log.Fatalf("fatal: can't find root CA certificate\n")
+		log.Fatalln("fatal: can't find root CA certificate")
 	}
 
 	caPool := x509.NewCertPool()

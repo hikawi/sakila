@@ -67,6 +67,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64,linux/arm64
+          context: week4
           push: true
           tags: |
             ghcr.io/hikawi/sakila:week4

@@ -78,7 +78,7 @@ jobs:
         id: build-push
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.service }}
+          context: week1
           push: true
           tags: |
             ghcr.io/hikawi/sakila:week1
