@@ -1,0 +1,83 @@
+name: Sakila Week 3 CI/CD
+
+on:
+  push:
+    paths:
+      - "week3/**"
+  pull_request:
+    paths:
+      - "week3/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ">=1.25"
+          cache-dependency-path: week3/go.sum
+
+      - name: Install Dependencies
+        run: go mod download
+        working-directory: week3
+
+      - name: Test Go App
+        run: go test
+        working-directory: week3
+
+  build:
+    needs: ["test"]
+    name: Build only
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ">=1.25"
+          cache-dependency-path: week3/go.sum
+
+      - name: Install Dependencies
+        run: go mod download
+        working-directory: week3
+
+      - name: Build Go App
+        env:
+          CGO_ENABLED: 0
+          GOOS: linux
+        run: go build
+        working-directory: week3
+
+  push:
+    name: Build to GHCR
+    needs: ["build"]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service }}
+          push: true
+          tags: |
+            ghcr.io/hikawi/sakila:week3
