@@ -169,4 +169,27 @@ services:
       week3-opensearch-dashboards:
         condition: service_healthy
       week3-fluentbit:
-        condition: service_started
+        condition: service_healthy
+
+  week4-mtls:
+    image: cosmtrek/air
+    container_name: awad-week4-mtls
+    hostname: awad-week4-mtls
+    profiles: ["week4"]
+    networks: ["nw"]
+    working_dir: /app
+    command:
+      - -build.cmd
+      - go build -o tmp/mtls-server ./cmd/mtls
+      - -build.bin
+      - tmp/mtls-server
+    ports:
+      - 3003:443
+    volumes:
+      - ./week4:/app
+      - /app/tmp
+    environment:
+      MYSQL_DSN: ${MYSQL_DSN}
+    depends_on:
+      mysql:
+        condition: service_healthy

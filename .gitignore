@@ -2,4 +2,5 @@
 .env
 tmp
 log
+certs
 

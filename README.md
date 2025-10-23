@@ -41,6 +41,7 @@ By default, there are these published ports:
 - `3000` for Week 1.
 - `3001` for Week 2.
 - `3002` for Week 3.
+- `3003`, `3004` and `3005` for Week 4.
 
 I know usually when you isolate profiles, these will only map in the correct
 ports for that specific week. But if in any case, you need to spin up every
@@ -73,7 +74,7 @@ CGO_ENABLED=0 GOOS="your-os" GOARCH="your-arch" ldflags="-w -s" go build -o serv
 If you want to go native, you need to provide the correct environment values. A
 local `.env` file is supported.
 
-All weeks are using port `80`.
+All weeks are using port `80`. Except for `week4`.
 
 ## Production Environment
 
@@ -91,7 +92,8 @@ integrations.
 | :--: | ---------------------------------------------------------- |
 |  1   | Actors REST API                                            |
 |  2   | Films REST API + Request Validator + Swagger Documentation |
-|  3   | Actors REST API + ODF stack for logging and monitoring (1) |
+|  3   | Films REST API + ODF stack for logging and monitoring (1)  |
+|  4   | Actors REST API + API Security                             |
 
 Notes:
 
