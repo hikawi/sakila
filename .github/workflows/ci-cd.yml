@@ -5,37 +5,14 @@ on:
   pull_request:
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.filter.outputs.changes }}
-    name: Check for file changes
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Filter paths
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            week1:
-              - 'week1/**'
-            week2:
-              - 'week2/**'
-            week3:
-              - 'week3/**'
-            week4:
-              - 'week4/**'
-            week5:
-              - 'week5/**'
-
   test:
-    needs: ["changes"]
-    if: ${{ needs.changes.outputs.matrix != '[]' }}
     strategy:
       matrix:
-        service: ${{ fromJson(needs.changes.outputs.matrix) }}
+        service:
+          - week1
+          - week2
+          - week3
+          - week4
     runs-on: ubuntu-latest
     name: Test
     steps:
@@ -57,11 +34,14 @@ jobs:
         working-directory: ${{ matrix.service }}
 
   build:
-    needs: ["changes", "test"]
-    if: ${{ needs.changes.outputs.matrix != '[]' }}
+    needs: ["test"]
     strategy:
       matrix:
-        service: ${{ fromJson(needs.changes.outputs.matrix) }}
+        service:
+          - week1
+          - week2
+          - week3
+          - week4
     name: Build only
     runs-on: ubuntu-latest
     steps:
@@ -87,11 +67,14 @@ jobs:
 
   push:
     name: Build to GHCR
-    if: ${{ needs.changes.outputs.matrix != '[]' }}
     strategy:
       matrix:
-        service: ${{ fromJson(needs.changes.outputs.matrix) }}
-    needs: ["test", "build", "changes"]
+        service:
+          - week1
+          - week2
+          - week3
+          - week4
+    needs: ["build"]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -107,7 +90,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image (latest + commit-sha)
+      - name: Build and push Docker image
         id: build-push
         uses: docker/build-push-action@v5
         with:
