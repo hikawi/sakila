@@ -175,18 +175,41 @@ services:
     image: cosmtrek/air
     container_name: awad-week4-mtls
     hostname: awad-week4-mtls
-    profiles: ["week4"]
+    profiles: ["week4-mtls"]
     networks: ["nw"]
     working_dir: /app
     command:
       - -build.cmd
-      - go build -o tmp/mtls-server ./cmd/mtls
+      - go build -o tmp/server ./cmd/server
       - -build.bin
-      - tmp/mtls-server
+      - tmp/server
     ports:
       - 3003:443
     volumes:
-      - ./week4:/app
+      - ./week4-mtls:/app
+      - /app/tmp
+    environment:
+      MYSQL_DSN: ${MYSQL_DSN}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  week4-apitoken:
+    image: cosmtrek/air
+    container_name: awad-wee4-apitoken
+    hostname: awad-week4-apitoken
+    profiles: ["week4-apitoken"]
+    networks: ["nw"]
+    working_dir: /app
+    command:
+      - -build.cmd
+      - go build -o tmp/server ./cmd/server
+      - -build.bin
+      - tmp/server
+    ports:
+      - 3004:80
+    volumes:
+      - ./week4-apitoken:/app
       - /app/tmp
     environment:
       MYSQL_DSN: ${MYSQL_DSN}

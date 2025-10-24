@@ -1,4 +1,4 @@
-# Week 4
+# Week 4 - MTLS
 
 ## Overview
 
@@ -18,12 +18,10 @@ Technology Stack employed:
 Refer to the root directory's `docker-compose.yml`.
 
 ```bash
-docker compose --profile week4 up
+docker compose --profile week4-mtls up
 ```
 
-The server will run on:
-
-- MTLS server on exposed `443`, Docker will map from `3003` to `443`.
+The server will run on port `3003` mapped to container's `443`.
 
 ### Native
 
@@ -32,7 +30,7 @@ hot reloads. Otherwise, running the following command and killing the process as
 you go also works:
 
 ```bash
-go run ./cmd/mtls
+go run ./cmd/server
 ```
 
 ### Common Problems
@@ -41,7 +39,7 @@ go run ./cmd/mtls
 
 You might see:
 
-```
+```plaintext
 fatal: can't find root CA certificate
 ```
 
@@ -62,15 +60,15 @@ docker build -t week4
 docker run --name week4 -p 3004:443 -v ./certs:/app/certs week4
 ```
 
-## Problems & Solutions
-
-There are three problems to solve for as outlined below.
-
-### Internal Clients
+## Solution
 
 Server will run on port `443` if run directly.
 
-Solution: mutual TLS. Simple TLS is that the server has to present a certificate
+**Situation**: Clients that are trusted inside a domain or an inner circle
+can connect, for example, in a law firm or a medical setting. Under no
+circumstances are uncontrolled machines connected.
+
+**Solution**: mutual TLS. Simple TLS is that the server has to present a certificate
 to prove that it is who it claims to be. Mutual TLS requires the client also to
 present a certificate.
 

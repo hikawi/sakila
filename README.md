@@ -15,6 +15,9 @@ Make sure you have setup `.env` file. If you use Compose, make sure that `.env`
 file stays at the same directory as `docker-compose.yml`. If you want to run
 native, `godotenv` also supports loading an `.env` at each week's root.
 
+**I recommend cleaning and rebuilding the MySQL server through each run as
+each week might modify the database.**
+
 ### Docker
 
 Requirements:
@@ -88,13 +91,14 @@ integrations.
 
 ## Week Overview
 
-| Week | Contents                                                   |
-| :--: | ---------------------------------------------------------- |
-|  1   | Actors REST API                                            |
-|  2   | Films REST API + Request Validator + Swagger Documentation |
-|  3   | Films REST API + ODF stack for logging and monitoring (1)  |
-|  4   | Actors REST API + API Security                             |
+| Week |                                                                                                                                                                                                       CI/CD Status                                                                                                                                                                                                       | Contents                                                   |
+| :--: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | ---------------------------------------------------------- |
+|  1   |                                                                                                                                               ![GitHub Actions Workflow Status for Week 1](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week1.yml)                                                                                                                                                | Actors REST API                                            |
+|  2   |                                                                                                                                               ![GitHub Actions Workflow Status for Week 2](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week2.yml)                                                                                                                                                | Films REST API + Request Validator + Swagger Documentation |
+|  3   |                                                                                                                                               ![GitHub Actions Workflow Status for Week 3](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week3.yml)                                                                                                                                                | Films REST API + ODF stack for logging and monitoring (1)  |
+|  4   | ![GitHub Actions Workflow Status for Week 4 mTLS](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week4-mtls.yml) ![GitHub Actions Workflow Status for Week 4 API Token](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week4-apitoken.yml) ![GitHub Actions Workflow Status for Week 4 JWT](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week4-jwt.yml) | Actors REST API + API Security (2)                         |
 
-Notes:
+Notes on Tech/Libraries used:
 
 - (1): Includes **O**penSearch, OpenSearch **D**ashboards and **F**luentbit.
+- (2): Includes mTLS with Go's `x509`, API Token and JWT.

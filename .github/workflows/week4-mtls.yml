@@ -1,12 +1,12 @@
-name: Sakila Week 4 CI/CD
+name: Sakila Week 4 CI/CD (mTLS)
 
 on:
   push:
     paths:
-      - "week4/**"
+      - "week4-mtls/**"
   pull_request:
     paths:
-      - "week4/**"
+      - "week4-mtls/**"
   workflow_dispatch:
 
 jobs:
@@ -24,19 +24,19 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ">=1.25"
-          cache-dependency-path: week4/go.sum
+          cache-dependency-path: week4-mtls/go.sum
 
       - name: Install Dependencies
         run: go mod download
-        working-directory: week4
+        working-directory: week4-mtls
 
       - name: Build Go App
         env:
           CGO_ENABLED: 0
           GOOS: linux
         run: |
-          go build ./cmd/${{ matrix.cmd }}
-        working-directory: week4
+          go build ./cmd/server
+        working-directory: week4-mtls
 
   push:
     name: Build to GHCR
@@ -67,7 +67,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64,linux/arm64
-          context: week4
+          context: week4-mtls
           push: true
           tags: |
-            ghcr.io/hikawi/sakila:week4
+            ghcr.io/hikawi/sakila:week4-mtls
