@@ -1,12 +1,12 @@
-name: Sakila Week 4 CI/CD (API Token)
+name: Sakila Week 4 CI/CD (JWT)
 
 on:
   push:
     paths:
-      - "week4-apitoken/**"
+      - "week4-jwt/**"
   pull_request:
     paths:
-      - "week4-apitoken/**"
+      - "week4-jwt/**"
   workflow_dispatch:
 
 jobs:
@@ -21,11 +21,11 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ">=1.25"
-          cache-dependency-path: week4-mtls/go.sum
+          cache-dependency-path: week4-jwt/go.sum
 
       - name: Install Dependencies
         run: go mod download
-        working-directory: week4-apitoken
+        working-directory: week4-jwt
 
       - name: Build Go App
         env:
@@ -33,7 +33,7 @@ jobs:
           GOOS: linux
         run: |
           go build ./cmd/server
-        working-directory: week4-apitoken
+        working-directory: week4-jwt
 
   push:
     name: Build to GHCR
@@ -67,4 +67,4 @@ jobs:
           context: week4-apitoken
           push: true
           tags: |
-            ghcr.io/hikawi/sakila:week4-apitoken
+            ghcr.io/hikawi/sakila:week4-jwt

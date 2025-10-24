@@ -12,9 +12,6 @@ on:
 jobs:
   build:
     name: Build only
-    strategy:
-      matrix:
-        cmd: ["mtls"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
