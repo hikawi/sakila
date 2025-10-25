@@ -64,5 +64,6 @@ func CheckJWT(db *gorm.DB) func(*gin.Context) {
 
 		g.Set("user", user)
 		g.Set("jti", jti)
+		g.Next()
 	}
 }

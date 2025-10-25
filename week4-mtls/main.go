@@ -44,7 +44,7 @@ func main() {
 		Handler: ginServer,
 		TLSConfig: &tls.Config{
 			ClientCAs:  caPool,
-			ClientAuth: tls.RequireAndVerifyClientCert,
+			ClientAuth: tls.RequestClientCert,
 		},
 	}
 
