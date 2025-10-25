@@ -7,7 +7,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux ldflags="-s -w" go build -o bin/server ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux ldflags="-s -w" go build -o bin/server .
 
 FROM alpine:latest
 

@@ -32,7 +32,7 @@ jobs:
           CGO_ENABLED: 0
           GOOS: linux
         run: |
-          go build ./cmd/server
+          go build .
         working-directory: week4-apitoken
 
   push:

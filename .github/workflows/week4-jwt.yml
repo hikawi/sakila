@@ -32,7 +32,7 @@ jobs:
           CGO_ENABLED: 0
           GOOS: linux
         run: |
-          go build ./cmd/server
+          go build .
         working-directory: week4-jwt
 
   push:
@@ -64,7 +64,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64,linux/arm64
-          context: week4-apitoken
+          context: week4-jwt
           push: true
           tags: |
             ghcr.io/hikawi/sakila:week4-jwt
