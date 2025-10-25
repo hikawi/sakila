@@ -30,7 +30,7 @@ hot reloads. Otherwise, running the following command and killing the process as
 you go also works:
 
 ```bash
-go run ./cmd/server
+go run .
 ```
 
 ### Common Problems
