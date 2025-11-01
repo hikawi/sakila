@@ -16,6 +16,13 @@ services:
     image: mariadb:12
     hostname: mysql
     container_name: awad-mysql
+    profiles:
+      - week1
+      - week2
+      - week3
+      - week4-apitoken
+      - week4-jwt
+      - week4-mtls
     networks:
       - nw
     environment:
@@ -225,3 +232,25 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+
+  week5-directus:
+    image: directus/directus
+    container_name: awad-week5-directus
+    hostname: awad-week5-directus
+    profiles: ["week5"]
+    networks: ["nw"]
+    ports:
+      - 8055:8055
+    environment:
+      SECRET: ${DIRECTUS_SECRET}
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+      DB_CLIENT: ${DIRECTUS_DB_CLIENT}
+      DB_FILENAME: ${DIRECTUS_DB_FILENAME}
+      WEBSOCKETS_ENABLED: ${DIRECTUS_WEBSOCKETS_ENABLED}
+      CORS_ENABLED: true
+      CORS_ORIGIN: ${DIRECTUS_CORS_ORIGIN}
+    volumes:
+      - ./week5/directus/database:/directus/database
+      - ./week5/directus/uploads:/directus/uploads
+      - ./week5/directus/extensions:/directus/extensions

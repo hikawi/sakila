@@ -1,0 +1,38 @@
+name: Sakila Week 5 CI/CD
+
+on:
+  push:
+    paths:
+      - "week5/**"
+  pull_request:
+    paths:
+      - "week5/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Vue TSC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: latest
+          cache: pnpm
+          cache-dependency-path: week5/frontend/pnpm-lock.yaml
+
+      - name: Install Dependencies
+        run: pnpm i
+        working-directory: week5/frontend
+
+      - name: Build TSC
+        run: pnpm build
+        working-directory: week5/frontend

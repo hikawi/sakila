@@ -45,6 +45,7 @@ By default, there are these published ports:
 - `3001` for Week 2.
 - `3002` for Week 3.
 - `3003`, `3004` and `3005` for Week 4.
+- `8055`, `5173` (Vite server) for Week 5.
 
 I know usually when you isolate profiles, these will only map in the correct
 ports for that specific week. But if in any case, you need to spin up every
@@ -97,6 +98,7 @@ integrations.
 |  2   |                                                                                                                                               ![GitHub Actions Workflow Status for Week 2](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week2.yml)                                                                                                                                                | Films REST API + Request Validator + Swagger Documentation |
 |  3   |                                                                                                                                               ![GitHub Actions Workflow Status for Week 3](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week3.yml)                                                                                                                                                | Films REST API + ODF stack for logging and monitoring (1)  |
 |  4   | ![GitHub Actions Workflow Status for Week 4 mTLS](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week4-mtls.yml) ![GitHub Actions Workflow Status for Week 4 API Token](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week4-apitoken.yml) ![GitHub Actions Workflow Status for Week 4 JWT](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week4-jwt.yml) | Actors REST API + API Security (2)                         |
+|  5   |                                                                                                                                             ![GitHub Actions Workflow Status for Week 5](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week5.yml) N/A                                                                                                                                              | Directus Headless CMS                                      |
 
 Notes on Tech/Libraries used:
 
