@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import SelfCard from "../shared/SelfCard.vue";
 
 type Post = {
   id: number;
@@ -34,6 +35,8 @@ onMounted(async () => {
 </script>
 
 <template>
+  <SelfCard />
+
   <div class="p-6 text-lg font-bold" v-if="posts.length == 0">
     Oopsie, no posts!
   </div>
