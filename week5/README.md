@@ -91,6 +91,32 @@ Result:
 ╰──────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
+## Common Issues
+
+### SQLITE CANT OPEN error
+
+This is usually because of restricted permissions on Unix-based systems and Docker
+Service running on Rootless Mode.
+
+You need to create the following folders if Directus on Docker Compose did not
+create for you:
+
+- `week5/directus/database`
+- `week5/directus/extensions`
+- `week5/directus/uploads`
+
+You also need to make sure the folders are mountable for Docker.
+
+```bash
+chmod -R 777 ./week5/directus
+```
+
+Now tearing down containers and rebuilding should work fine. This was tested on:
+
+- Arch Linux 6.17.7
+- amd64 architecture
+- Docker Engine Rootless Mode
+
 ## References
 
 - [What is Headless CMS? - AWS](https://aws.amazon.com/what-is/headless-cms/#:~:text=A%20headless%20content%20management%20system,effective%20solution%20for%20managing%20content.)
