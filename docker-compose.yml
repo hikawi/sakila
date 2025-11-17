@@ -254,3 +254,51 @@ services:
       - ./week5/directus/database:/directus/database
       - ./week5/directus/uploads:/directus/uploads
       - ./week5/directus/extensions:/directus/extensions
+
+  week7-rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: awad-week7-rabbitmq
+    hostname: awad-week7-rabbitmq
+    profiles: ["week7"]
+    networks: ["nw"]
+    ports:
+      - 5672:5672
+
+  week7-sakura:
+    image: cosmtrek/air
+    container_name: awad-week7-sakura
+    hostname: awad-week7-sakura
+    profiles: ["week7"]
+    networks: ["nw"]
+    working_dir: /app
+    # ports:
+    #   - 3006:80
+    volumes:
+      - ./week7/sakura:/app
+      - /app/tmp
+
+  week7-sakura2:
+    image: cosmtrek/air
+    container_name: awad-week7-sakura2
+    hostname: awad-week7-sakura2
+    profiles: ["week7"]
+    networks: ["nw"]
+    working_dir: /app
+    # ports:
+    #   - 3006:80
+    volumes:
+      - ./week7/sakura:/app
+      - /app/tmp
+
+  week8-tomoyo:
+    image: cosmtrek/air
+    container_name: awad-week7-tomoyo
+    hostname: awad-week7-tomoyo
+    profiles: ["week7"]
+    networks: ["nw"]
+    working_dir: /app
+    ports:
+      - 3006:80
+    volumes:
+      - ./week7/tomoyo:/app
+      - /app/tmp
