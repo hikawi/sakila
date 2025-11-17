@@ -99,6 +99,7 @@ integrations.
 |  3   |                                                                                                                                               ![GitHub Actions Workflow Status for Week 3](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week3.yml)                                                                                                                                                | Films REST API + ODF stack for logging and monitoring (1)  |
 |  4   | ![GitHub Actions Workflow Status for Week 4 mTLS](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week4-mtls.yml) ![GitHub Actions Workflow Status for Week 4 API Token](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week4-apitoken.yml) ![GitHub Actions Workflow Status for Week 4 JWT](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week4-jwt.yml) | Actors REST API + API Security (2)                         |
 |  5   |                                                                                                                                               ![GitHub Actions Workflow Status for Week 5](https://img.shields.io/github/actions/workflow/status/hikawi/sakila/week5.yml)                                                                                                                                                | Directus Headless CMS & Vue Frontend                       |
+| 6 | N/A | Real-time connections |
 
 Notes on Tech/Libraries used:
 
