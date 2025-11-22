@@ -14,8 +14,6 @@ cmd = "go build -o ./tmp/main cmd/server/main.go"
 entrypoint = ["./tmp/main"]
 # Customize binary, can setup environment variables when run your app.
 full_bin = "APP_ENV=dev APP_USER=air ./tmp/main"
-# Add additional arguments when running binary (bin/full_bin). Will run './tmp/main hello world'.
-args_bin = ["hello", "world"]
 # Watch these filename extensions.
 include_ext = ["go", "tpl", "tmpl", "html"]
 # Ignore these filename extensions or directories.
@@ -71,7 +69,6 @@ runner = "green"
 clean_on_exit = true
 
 [screen]
-clear_on_rebuild = true
 keep_scroll = true
 
 [proxy]

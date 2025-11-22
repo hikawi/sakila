@@ -119,6 +119,7 @@ services:
       - /app/tmp
     environment:
       FLUENTBIT_URL: ${FLUENTBIT_URL}
+      POSTGRES_DSN: ${POSTGRES_DSN}
     depends_on:
       opensearch:
         condition: service_healthy
