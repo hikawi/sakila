@@ -1,0 +1,130 @@
+name: awad-midterms
+
+networks:
+  nw:
+    driver: bridge
+
+volumes:
+  pgdata:
+    name: awad-midterms-pgdata
+  opensearch-data:
+    name: awad-midterms-opensearch
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: awad-midterms-postgres
+    hostname: awad-midterms-postgres
+    networks:
+      - nw
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: awad-midterms
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d awad-midterms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Taken from OpenSearch's Docker example file for local development
+  opensearch:
+    image: opensearchproject/opensearch
+    container_name: awad-midterms-opensearch-node1
+    hostname: awad-midterms-opensearch-node1
+    environment:
+      - cluster.name=opensearch-cluster # Name the cluster
+      - node.name=opensearch-node1 # Name the node that will run in this container
+      - discovery.seed_hosts=opensearch-node1 # Nodes to look for when discovering the cluster
+      - cluster.initial_master_nodes=opensearch-node1
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # Set min and max JVM heap sizes to at least 50% of system RAM
+      - "DISABLE_INSTALL_DEMO_CONFIG=true" # Prevents execution of bundled demo script which installs demo certificates and security configurations to OpenSearch
+      - "DISABLE_SECURITY_PLUGIN=true" # Disables Security plugin
+    networks:
+      - nw
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600
+    healthcheck:
+      test: ["CMD", "curl", "-fsSL", "http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # Taken from OpenSearch's Docker example file
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards
+    container_name: awad-midterms-opensearch-dashboard
+    ports:
+      - 5601:5601
+    networks:
+      - nw
+    expose:
+      - "5601" # Expose port 5601 for web access to OpenSearch Dashboards
+    environment:
+      - 'OPENSEARCH_HOSTS=["http://awad-midterms-opensearch-node1:9200"]'
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
+    healthcheck:
+      test: ["CMD", "curl", "-fsSL", "http://localhost:5601/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  fluentbit:
+    image: fluent/fluent-bit
+    container_name: awad-midterms-fluentbit
+    hostname: awad-midterms-fluentbit
+    networks:
+      - nw
+    ports:
+      - 8888:8888
+      - 2020:2020
+    volumes:
+      - ./fluent-bit.yaml:/fluent-bit/fluent-bit.yaml
+      - ./log:/var/log
+    command: /fluent-bit/bin/fluent-bit -c /fluent-bit/fluent-bit.yaml
+    depends_on:
+      opensearch:
+        condition: service_healthy
+
+  app:
+    image: cosmtrek/air
+    container_name: awad-midterms
+    hostname: awad-midterms
+    networks:
+      - nw
+    working_dir: /app
+    ports:
+      - 3000:80
+    volumes:
+      - ./app:/app/
+      - ./log:/var/log
+      - /app/tmp
+    environment:
+      FLUENTBIT_URL: ${FLUENTBIT_URL}
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      opensearch-dashboards:
+        condition: service_healthy
+      fluentbit:
+        condition: service_started
+      postgres:
+        condition: service_healthy
