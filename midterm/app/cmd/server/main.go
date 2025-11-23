@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -14,28 +13,18 @@ import (
 	"luny.dev/sakila/midterms/internal/utils"
 )
 
-func Fatalenv(key string) string {
-	val, ok := os.LookupEnv(key)
-
-	if !ok {
-		log.Fatalf("fatal: env variable %s not found\n", key)
-	}
-
-	return val
-}
-
 func main() {
 	server := gin.Default()
 	utils.InitLogger()
+	utils.InitRabbitMQ("midterms")
 
 	docs.SwaggerInfo.Description = "Hey"
 	docs.SwaggerInfo.BasePath = "/v1"
 
-	db, err := gorm.Open(postgres.Open(Fatalenv("POSTGRES_DSN")), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(utils.FatalEnv("POSTGRES_DSN")), &gorm.Config{})
 	if err != nil {
 		log.Fatalln("fatal: can't connect to postgresql")
 	}
-
 	db.DB()
 
 	{

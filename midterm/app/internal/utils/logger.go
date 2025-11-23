@@ -3,6 +3,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 )
@@ -19,6 +20,9 @@ func InitLogger() {
 func LogJSON(v any) {
 	go func(data any) {
 		b, _ := json.Marshal(data)
-		logger.Write(append(b, '\n'))
+		_, err := logger.Write(append(b, '\n'))
+		if err != nil {
+			fmt.Println("warning: error occurred during logging json", err.Error())
+		}
 	}(v)
 }

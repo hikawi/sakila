@@ -30,6 +30,15 @@ services:
       retries: 5
       start_period: 10s
 
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: awad-midterms-rabbitmq
+    hostname: awad-midterms-rabbitmq
+    networks:
+      - nw
+    ports:
+      - 5672:5672
+
   # Taken from OpenSearch's Docker example file for local development
   opensearch:
     image: opensearchproject/opensearch
@@ -119,6 +128,7 @@ services:
       - /app/tmp
     environment:
       FLUENTBIT_URL: ${FLUENTBIT_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
       POSTGRES_DSN: ${POSTGRES_DSN}
     depends_on:
       opensearch:
